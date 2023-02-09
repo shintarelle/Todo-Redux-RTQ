@@ -1,16 +1,13 @@
 
-import React, { useEffect } from 'react';
 import './App.css';
 import ControllerTodo from './components/ControllerTodo';
 import ListTodo from './components/ListTodo';
-import { useState,useEffect } from 'react';
+import { useState } from 'react';
 
 
 export default function App() {
   const [isSearched, setSearched] = useState(false);
   const [searchState, setSearchState] = useState([]);
-
-  useEffect
 
   const renderSearch = (searchState) => {
     setSearched(true)
