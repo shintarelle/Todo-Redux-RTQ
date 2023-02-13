@@ -14,9 +14,100 @@ export const fetchTodos = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-
   }
 )
+export const addTodoAsync = createAsyncThunk(
+  'todos/addTodoAsync',
+  async function (text, {rejectWithValue, dispatch}) {
+    try {
+      const todo = {
+        title: text,
+        completed: false,
+      }
+      const responce = await fetch('https://jsonplaceholder.typicode.com/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(todo),
+      });
+      if (!responce.ok) {
+        throw new Error('can\'t create new element');
+      }
+      dispatch(addTodo(text))
+      const data = await responce.json();
+      console.log('data in add todo', data);
+
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+)
+export const deleteTodo = createAsyncThunk(
+    'todos/deleteTodo',
+    async function (id, {rejectWithValue, dispatch}) {
+      try {
+        const responce = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+          method: 'DELETE',
+        })
+        console.log('responce delete', responce)
+        if (!responce.ok) {
+          throw new Error('cant delete element: ' + id)
+        }
+        dispatch(removeTodo(id))
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+)
+export const toggleTodoAsync = createAsyncThunk(
+  'todos/toggleTodoAsync',
+  async function (id, { rejectWithValue, dispatch, getState }) {
+    const todo = getState().todos.find(todo => todo.id == id);
+    // console.log('todo in async toggle', todo, id);
+    try {
+      const responce = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          completed: !todo.completed,
+        }),
+      })
+      // console.log('responce toggle', responce)
+      if (!responce.ok) {
+        throw new Error('cant toggle status of element: ' + id)
+      }
+      // const data = await responce.json()
+      // console.log('data', data)
+      dispatch(toggleComplete(id))
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+)
+export const saveTodoAsync = createAsyncThunk(
+  'todos/saveTodoAsync',
+  async function ({ id, value }, { rejectWithValue, dispatch, getState }) {
+    const todo = getState().todos.find(todo => todo.id == id);
+    try {
+      const responce = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: value,
+        }),
+      })
+      if (!responce.ok) {
+        throw new Error('can\'t change title of element: ' + id)
+      }
+      dispatch(saveTodo({ id, value }))
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+)
+const setError = (state, action) => {
+      state.status = 'rejected';
+      state.error = action.payload;
+    }
 const todosSlice = createSlice({
   name: 'todos',
   initialState: {
@@ -28,7 +119,7 @@ const todosSlice = createSlice({
     addTodo(state, action) {
       console.log(action)
         state.todos.push({
-          id: new Date().toISOString(),
+          id: new Date().toISOString(),        //different id on UI and Server
           title: action.payload,
           completed: false,
       //     const todo = action.payload
@@ -84,13 +175,14 @@ const todosSlice = createSlice({
       // console.log('fulfilled.action', action)
       state.todos = action.payload;
     },
-    [fetchTodos.rejected]: (state, action) => {
-      state.status = 'rejected';
-      state.error = action.payload;
-    },
-
+    [fetchTodos.rejected]: setError,
+    [addTodoAsync.rejected]: setError,
+    [deleteTodo.rejected]: setError,
+    [toggleTodoAsync.rejected]: setError,
+    [saveTodoAsync.rejected]: setError,
   },
-})
+  })
+
 // console.log('todosSlice', todosSlice)
 export const { addTodo, clearTodo, sortByMin, sortByMax, toggleComplete, removeTodo, saveTodo } = todosSlice.actions
 export default todosSlice.reducer
