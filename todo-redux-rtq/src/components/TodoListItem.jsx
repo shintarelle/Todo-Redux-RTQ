@@ -2,7 +2,7 @@ import React from 'react';
 import { createRef } from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import {toggleComplete, removeTodo, saveTodo} from '../store/todosSlice'
+import {toggleComplete, removeTodo, saveTodo, deleteTodo, toggleTodoAsync, saveTodoAsync} from '../store/todosSlice'
 
 
 export default function TodoListItem({ todo }) {
@@ -11,17 +11,18 @@ export default function TodoListItem({ todo }) {
   const dispatch = useDispatch();
 
   const handleChangeCompleted = (e) => {
-    dispatch(toggleComplete(e.target.parentNode.id))
+    // dispatch(toggleComplete(e.target.parentNode.id))
+    dispatch(toggleTodoAsync(e.target.parentNode.id))
   }
   const handleRemoveTodo = (e) => {
-    // console.log(e.target.parentNode.id)
-    dispatch(removeTodo(e.target.parentNode.id))
+    // dispatch(removeTodo(e.target.parentNode.id))  // удаление элемента просто обычным редюсером
+    dispatch(deleteTodo(e.target.parentNode.id))  // delete from the server
   }
   const handleSaveTodo = (e) => {
     const value = inputRef.current.value
     console.log(value)
     console.log(e.target.parentNode.id)
-    dispatch(saveTodo({ id: e.target.parentNode.id, value: value }))
+    dispatch(saveTodoAsync({ id: e.target.parentNode.id, value: value }))
     setEditable(!isEditable)
   }
 

@@ -1,10 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addTodo, clearTodo, sortByMin, sortByMax } from '../store/todosSlice'
-
-
-
+import { addTodo, clearTodo, sortByMin, sortByMax, addTodoAsync } from '../store/todosSlice';
 
 export default function ControllerTodo({renderSearch, updateTodo}) {
   const [text, setText] = useState('')
@@ -15,7 +12,7 @@ export default function ControllerTodo({renderSearch, updateTodo}) {
 
   const handleAddTodo = () => {
     if (text) {
-      dispatch(addTodo(text))
+      dispatch(addTodoAsync(text))
       setText('')
     }
   }
