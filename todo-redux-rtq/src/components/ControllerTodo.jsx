@@ -2,16 +2,25 @@ import React from 'react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addTodo, clearTodo, sortByMin, sortByMax } from '../store/todosSlice'
+import { useAddTodoMutation } from './TodoApi';
 
 
 
 
-export default function ControllerTodo({renderSearch, updateTodo}) {
-  const [text, setText] = useState('')
-  const [search, searchText] = useState('')
-  const state = useSelector(state => state)
-  const dispatch = useDispatch()
+export default function ControllerTodo({showCount, count}) {
+  const [text, setText] = useState('');
+
+  const state = useSelector(state => state);
+  const dispatch = useDispatch();
   // console.log('state.todos', state.todos)
+
+  const [addTodoQuerry, {isLoading, isError}] = useAddTodoMutation()
+  const handleAddTodoQuerry = async () => {
+    if (text) {
+      await  addTodoQuerry({title: text, completed: false}).unwrap()
+      setText('')
+    }
+  }
 
   const handleAddTodo = () => {
     if (text) {
@@ -22,41 +31,21 @@ export default function ControllerTodo({renderSearch, updateTodo}) {
   const handleClearAll = () => {
     dispatch(clearTodo())
   }
-  const handleSearchTodo = () => {
-    const searchState = state.todos.filter(todo => todo.title.includes(search))
-    // console.log(searchState)
-    renderSearch(searchState)
-    searchText('')
-  }
-  const handleUpdateTodo = () => {
-    updateTodo()
-  }
 
-  const handleSortByMin = () => {
-    dispatch(sortByMin())
-  }
-  const handleSortByMax = () => {
-    dispatch(sortByMax())
-  }
   return (
     <div className='controller'>
       <div className="controller-todo">
         <input className="controller-input" value={text} onChange={(e) => setText(e.target.value)} />
-        <button className="btn" onClick={handleAddTodo}>Add</button>
-        <button className="btn" onClick={handleClearAll}>Clear All</button>
+        <button className="btn" onClick={handleAddTodoQuerry}>Add</button>
+        {/* <button className="btn" onClick={handleClearAll}>Clear All</button> */}
       </div>
-      <div className="controller-search">
-        <input className="controller-input" value={search} placeholder='seach...' onChange={(e) => searchText(e.target.value)} />
-        <button className="btn" onClick={handleSearchTodo}>Search</button>
-        <button className="btn" onClick={handleUpdateTodo}>Update</button>
-      </div>
-      <div className='controller-sort'>Sort:
-        <label >
-          <input type="radio" name="min-max" onClick={handleSortByMin} />min to max
-        </label>
-        <label>
-          <input type="radio" name="min-max" onClick={handleSortByMax} />max to min
-        </label>
+      <div className="controller-select">
+        <select  className="select" value={count} onChange={(event) => showCount(event.target.value)}>
+          <option value="">all</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
       </div>
     </div>
   );

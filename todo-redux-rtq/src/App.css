@@ -35,6 +35,18 @@
   display: flex;
   gap: 3px;
 }
+.controller-select {
+  padding: 5px 0px;
+}
+.select {
+  /* padding: 5px 0px; */
+  font-size: 18px;
+  background-color: rgb(188, 230, 250);
+  border-radius: 4px;
+  width: 200px;
+  height: 25px;
+  align-items: center;
+}
 .controller-sort {
   padding: 5px 0px;
   display: flex;
