@@ -3,6 +3,7 @@ import { createRef } from 'react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {toggleComplete, removeTodo, saveTodo} from '../store/todosSlice'
+import { useDeleteTodoMutation } from './TodoApi';
 
 
 export default function TodoListItem({ todo }) {
@@ -10,13 +11,17 @@ export default function TodoListItem({ todo }) {
   const inputRef = createRef();
   const dispatch = useDispatch();
 
+  const [deleteTodoQuerry] = useDeleteTodoMutation();
+
   const handleChangeCompleted = (e) => {
     dispatch(toggleComplete(e.target.parentNode.id))
   }
-  const handleRemoveTodo = (e) => {
-    // console.log(e.target.parentNode.id)
-    dispatch(removeTodo(e.target.parentNode.id))
+
+  const handleDeleteTodoQuerry = async (e) => {
+    await deleteTodoQuerry(e.target.parentNode.id).unwrap();
   }
+
+
   const handleSaveTodo = (e) => {
     const value = inputRef.current.value
     console.log(value)
@@ -37,10 +42,10 @@ export default function TodoListItem({ todo }) {
   }
   return (
     <li className="todo-item" id={todo.id}>
-      <input type="checkbox" checked={todo.completed} onChange={(e) => handleChangeCompleted(e)} />
+      {/* <input type="checkbox" checked={todo.completed} onChange={(e) => handleChangeCompleted(e)} /> */}
       <span className="text">{todo.title}</span>
-      <button className="btn" onClick={() => setEditable(!isEditable)}>Edit</button>
-      <button className="btn" onClick={(e) => handleRemoveTodo(e)}>Remove</button>
+      {/* <button className="btn" onClick={() => setEditable(!isEditable)}>Edit</button> */}
+      <button className="btn" onClick={(e) => handleDeleteTodoQuerry(e)}>Remove</button>
     </li>
   )
 }
